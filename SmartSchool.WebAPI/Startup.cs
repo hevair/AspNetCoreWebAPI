@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -12,6 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using SmartSchool.WebAPI.Data;
+using SmartShool.WebAPI.Models;
 
 namespace SmartSchool.WebAPI
 {
@@ -32,7 +35,13 @@ namespace SmartSchool.WebAPI
                    Configuration.GetConnectionString("Default")
                 )
             );
-            services.AddControllers();
+
+            services.AddScoped<IRepository, Repository>();
+            services.AddScoped<IRepositoryAluno, RepositoryAluno>();
+            services.AddScoped<IRepositoryProfessor, RepositoryProfessor>();
+            services.AddControllers().AddJsonOptions(
+                j => j.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles
+            );
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

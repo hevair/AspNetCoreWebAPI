@@ -10,16 +10,19 @@ namespace SmartShool.WebAPI.Controllers
     public class ProfessorController: ControllerBase
     {
         private readonly SmartContext _context;
+        private readonly IRepository _repo;
+        private readonly IRepositoryProfessor _repoProf;
 
-        public ProfessorController(SmartContext context)
-        {
+        public ProfessorController(SmartContext context, IRepository repository, IRepositoryProfessor repoProf) {
             _context = context;
+            _repo = repository;
+            _repoProf = repoProf;
 
         }
 
         [HttpGet]
         public IActionResult Get(){
-            var prof = _context.professores;
+            var prof = _repoProf.GetAllProfessores();
 
             return Ok(prof);
         }
