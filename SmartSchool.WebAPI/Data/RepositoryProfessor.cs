@@ -15,7 +15,7 @@ namespace SmartSchool.WebAPI.Data
 
         public IEnumerable<Professor> GetAllProfessores(bool includeAluno = false)
         {
-            IQueryable<Professor> query = _context.professores;
+            IQueryable<Professor> query = _context.Professores;
                
                 query =  query.Include(p => p.Disciplinas)
                                 .ThenInclude(ad => ad.AlunoDisciplinas)

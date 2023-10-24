@@ -1,6 +1,8 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SmartSchool.WebAPI.Data;
+using SmartSchool.WebAPI.Dtos;
 using SmartShool.WebAPI.Models;
 
 namespace SmartShool.WebAPI.Controllers
@@ -12,52 +14,58 @@ namespace SmartShool.WebAPI.Controllers
         private readonly SmartContext _context;
         private readonly IRepository _repo;
         private readonly IRepositoryProfessor _repoProf;
+        private readonly IMapper _mapper;
 
-        public ProfessorController(SmartContext context, IRepository repository, IRepositoryProfessor repoProf) {
+        public ProfessorController(SmartContext context, IRepository repository, IRepositoryProfessor repoProf, IMapper mapper) {
             _context = context;
             _repo = repository;
             _repoProf = repoProf;
+            _mapper = mapper;
 
         }
 
         [HttpGet]
         public IActionResult Get(){
             var prof = _repoProf.GetAllProfessores();
-
-            return Ok(prof);
+            var profDTO = _mapper.Map<IEnumerable<ProfessorDTO>>(prof);
+            return Ok(profDTO);
         }
 
         [HttpGet("{id}")]
         public IActionResult GetById(int id){
-            var prof = _context.professores.FirstOrDefault(p => p.Id == id);
-            return Ok(prof);
+            var prof = _context.Professores.FirstOrDefault(p => p.Id == id);
+            if(prof == null) return BadRequest("Professor não encontrado");
+            var profDTO = _mapper.Map<ProfessorDTO>(prof);
+            return Ok(profDTO);
         }
 
         [HttpPost()]
-        public  IActionResult Post(Professor professor){
-
-             _context.Add(professor);
+        public  IActionResult Post(ProfessorRegistrarDTO professorDTO){
+            
+            var prof = _mapper.Map<Professor>(professorDTO);
+             _context.Add(prof);
              _context.SaveChanges();
 
-            return Ok(professor);
+            return Ok(prof);
         }
 
         [HttpPut("{id}")]
-        public IActionResult Put(int id, Professor professor){
-            var prof = _context.professores.AsNoTracking().FirstOrDefault(p => p.Id == id);
+        public IActionResult Put(int id, ProfessorDTO professorDTO){
+            var prof = _context.Professores.AsNoTracking().FirstOrDefault(p => p.Id == id);
 
             if(prof == null) return BadRequest("Professor não encontrado");
 
-            _context.Update(professor);
+            var profDTO = _mapper.Map<Professor>(professorDTO);
+            _context.Update(profDTO);
             _context.SaveChanges();
 
-            return Ok(professor);
+            return Ok(profDTO);
 
         }
 
         [HttpDelete("{id}")]
          public IActionResult Delete(int id, Professor professor){
-            var prof = _context.alunos.FirstOrDefault(a => a.Id == id);
+            var prof = _context.Alunos.FirstOrDefault(a => a.Id == id);
 
             if(prof == null){
                 return BadRequest("Professor não existe");
